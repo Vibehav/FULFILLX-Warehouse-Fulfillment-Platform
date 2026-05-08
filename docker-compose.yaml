@@ -4,7 +4,7 @@ services:
     image: postgres:16
     container_name: fulfillx-postgres
     environment:
-      POSTGRES_USER: vaibhav
+      POSTGRES_USER: fulfillx
       POSTGRES_PASSWORD: fulfillx123
       POSTGRES_DB: fulfillx
     ports:
@@ -22,7 +22,7 @@ services:
     image: rabbitmq:3.13-management
     container_name: fulfillx-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: vaibhav
+      RABBITMQ_DEFAULT_USER: fulfillx
       RABBITMQ_DEFAULT_PASS: fulfillx123
     ports:
       - "5672:5672"
