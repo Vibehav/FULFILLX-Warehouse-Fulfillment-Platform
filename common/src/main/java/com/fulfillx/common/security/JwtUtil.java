@@ -1,6 +1,5 @@
-package com.fulfillx.auth.security;
+package com.fulfillx.common.security;
 
-import com.fulfillx.auth.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -17,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class JwtUtil {
 
+    private final RedisTemplate<String, String> redisTemplate;
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -26,15 +27,15 @@ public class JwtUtil {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
-    private final RedisTemplate<String, String> redisTemplate;
 
     // Generate Access Token
-    public String generateToken(User user) {
+    public String generateToken(String email,String role,String tenantId,String userId) {
+
         return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("role", user.getRole().name())
-                .claim("tenantId", user.getTenantId())
-                .claim("userId", user.getId())
+                .subject(email)
+                .claim("role", role)
+                .claim("tenantId", tenantId)
+                .claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -42,15 +43,19 @@ public class JwtUtil {
     }
 
     // Generate Refresh Token
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(String email) {
         return Jwts.builder()
-                .subject(user.getEmail())
+                .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getSigningKey())
                 .compact();
     }
 
+    public String extractUserId(String token) {
+        return getClaims(token).getId();
+
+    }
     // Extract Email from Token
     public String extractEmail(String token) {
         return getClaims(token).getSubject();
@@ -76,20 +81,31 @@ public class JwtUtil {
         }
     }
 
-    // Blacklist Token on Logout
+
     public void blacklistToken(String token) {
-        long expirationTime = getClaims(token)
-                .getExpiration()
-                .getTime() - System.currentTimeMillis();
-        redisTemplate.opsForValue()
-                .set("blacklist:" + token, "true", expirationTime, TimeUnit.MILLISECONDS);
+        // Extract expiration date from the token claims
+        Claims claims = getClaims(token);
+        Date expirationDate = claims.getExpiration();
+
+        // calculate the remaining time in milliseconds
+        long currentTimeMillis = System.currentTimeMillis();
+        long expirationTimeMillis = expirationDate.getTime();
+        long ttl = expirationTimeMillis - currentTimeMillis;
+
+        // store in redis only if the token hasn't expired yet
+        if (ttl > 0) {
+            String key = "blacklist:" + token;
+            redisTemplate.opsForValue().set(key, "true", ttl, TimeUnit.MILLISECONDS);
+        }
     }
 
-    // Check if Token is Blacklisted
+    /**
+     * Checks if a specific token exists in the Redis blacklist.
+     */
     public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(
-                redisTemplate.hasKey("blacklist:" + token)
-        );
+        String key = "blacklist:" + token;
+        Boolean hasKey = redisTemplate.hasKey(key);
+        return hasKey;
     }
 
     // Get Claims from Token
@@ -106,4 +122,5 @@ public class JwtUtil {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }

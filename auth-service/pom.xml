@@ -18,6 +18,11 @@
     <description>Handles authentication, JWT, and role-based access</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fulfillx</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

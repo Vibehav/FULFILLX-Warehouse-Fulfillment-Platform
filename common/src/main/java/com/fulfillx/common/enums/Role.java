@@ -1,4 +1,4 @@
-package com.fulfillx.auth.enums;
+package com.fulfillx.common.enums;
 
 public enum Role {
     ADMIN,
@@ -7,9 +7,5 @@ public enum Role {
     INBOUND_OPERATOR,
     PICKER_PACKER,
     INVENTORY_AUDITOR,
-    VENDOR,
-    CATALOGUE_MANAGER,
-    FINANCE_MANAGER,
-    SUPPORT_AGENT,
-    RETURNS_AGENT
+    CATALOGUE_MANAGER
 }

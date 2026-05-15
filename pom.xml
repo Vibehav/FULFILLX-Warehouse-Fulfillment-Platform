@@ -82,6 +82,7 @@
 	</dependencyManagement>
 
 	<modules>
+		<module>common</module>
 		<module>auth-service</module>
 		<module>catalogue-service</module>
 		<module>inbound-service</module>
