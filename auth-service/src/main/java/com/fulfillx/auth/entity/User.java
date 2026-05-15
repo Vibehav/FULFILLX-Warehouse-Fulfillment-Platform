@@ -1,6 +1,6 @@
 package com.fulfillx.auth.entity;
 
-import com.fulfillx.auth.enums.Role;
+import com.fulfillx.common.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

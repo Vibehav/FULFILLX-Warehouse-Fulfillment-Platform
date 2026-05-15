@@ -1,6 +1,6 @@
 package com.fulfillx.auth.dto;
 
-import com.fulfillx.auth.enums.Role;
+import com.fulfillx.common.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

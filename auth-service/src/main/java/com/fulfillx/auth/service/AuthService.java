@@ -5,10 +5,13 @@ import com.fulfillx.auth.entity.User;
 import com.fulfillx.auth.exception.EmailAlreadyExistsException;
 import com.fulfillx.auth.exception.InvalidTokenException;
 import com.fulfillx.auth.repository.UserRepository;
-import com.fulfillx.auth.security.JwtUtil;
+import com.fulfillx.common.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +28,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already registered");
+            throw new EmailAlreadyExistsException(request.getEmail() + " is already been Registered.");
         }
 
         User user = User.builder()
@@ -37,12 +40,10 @@ public class AuthService {
                 .active(true)
                 .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         return AuthResponse.builder()
-                .accessToken(jwtUtil.generateToken(user))
-                .refreshToken(jwtUtil.generateRefreshToken(user))
-                .email(user.getEmail())
+                .accessToken(jwtUtil.generateToken(user.getEmail(), user.getRole().toString(), user.getTenantId(), user.getId()))                .email(user.getEmail())
                 .role(user.getRole().name())
                 .tenantId(user.getTenantId())
                 .build();
@@ -50,20 +51,21 @@ public class AuthService {
 
     // Login
     public AuthResponse login(LoginRequest request) {
-
+        System.out.println("Execution start");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-
+        System.out.println("executed upper");
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        System.out.println("executed check");
+        // Login
         return AuthResponse.builder()
-                .accessToken(jwtUtil.generateToken(user))
-                .refreshToken(jwtUtil.generateRefreshToken(user))
+                .accessToken(jwtUtil.generateToken(user.getEmail(), user.getRole().toString(), user.getTenantId(), user.getId()))
+                .refreshToken(jwtUtil.generateRefreshToken(user.getEmail()))
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .tenantId(user.getTenantId())
@@ -85,8 +87,8 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return AuthResponse.builder()
-                .accessToken(jwtUtil.generateToken(user))
-                .refreshToken(jwtUtil.generateRefreshToken(user))
+                .accessToken(jwtUtil.generateToken(user.getEmail(), user.getRole().toString(), user.getTenantId(), user.getId()))
+                .refreshToken(jwtUtil.generateRefreshToken(user.getEmail()))
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .tenantId(user.getTenantId())
