@@ -43,7 +43,7 @@ public class AuthService {
         user = userRepository.save(user);
 
         return AuthResponse.builder()
-                .accessToken(jwtUtil.generateToken(user.getEmail(), user.getRole().toString(), user.getTenantId(), user.getId()))                .email(user.getEmail())
+                .email(user.getEmail())
                 .role(user.getRole().name())
                 .tenantId(user.getTenantId())
                 .build();
