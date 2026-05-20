@@ -53,8 +53,7 @@ public class JwtUtil {
     }
 
     public String extractUserId(String token) {
-        return getClaims(token).getId();
-
+        return getClaims(token).get("userId", String.class);
     }
     // Extract Email from Token
     public String extractEmail(String token) {
@@ -99,9 +98,7 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Checks if a specific token exists in the Redis blacklist.
-     */
+    // Checks if a specific token exists in the Redis blacklist.
     public boolean isTokenBlacklisted(String token) {
         String key = "blacklist:" + token;
         Boolean hasKey = redisTemplate.hasKey(key);

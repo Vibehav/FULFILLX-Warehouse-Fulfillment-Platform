@@ -17,15 +17,12 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, RedisTemplate<String, String> redisTemplate){
-        this.jwtUtil=jwtUtil;
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         // 2. Check if header exists and starts with Bearer
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || authHeader.startsWith("Bearer ") == false) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,7 +53,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // 4. Validate token
         if (!jwtUtil.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token is invalid or blacklisted");
             return;
         }
 
