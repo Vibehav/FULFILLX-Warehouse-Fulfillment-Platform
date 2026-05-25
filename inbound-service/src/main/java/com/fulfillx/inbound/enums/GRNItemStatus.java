@@ -1,4 +1,7 @@
 package com.fulfillx.inbound.enums;
 
-public class GRNItemStatus {
+public enum GRNItemStatus {
+    PENDING,
+    ACCEPTED,
+    REJECTED
 }
