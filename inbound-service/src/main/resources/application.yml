@@ -25,6 +25,9 @@ spring:
     port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
+# Tell the Spring to wait for a "receipt" from RabbitMQ confirming the message safely reached the queue.
+    publisher-confirm-type: correlated
+    publisher-returns: true
 
   jpa:
     hibernate:

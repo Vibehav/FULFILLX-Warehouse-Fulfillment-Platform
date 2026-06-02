@@ -137,12 +137,13 @@ public class GRNServiceTest {
     // ✅ Test 5 — Scan Item Successfully
     @Test
     void scanItem_ShouldUpdateItem_WhenValidRequest() {
-        when(grnItemRepository.findById("item-001"))
+        when(grnItemRepository.findByGrnIdAndSkuId("grn-001", "sku-001"))
                 .thenReturn(Optional.of(mockGRNItem));
         when(grnItemRepository.save(any())).thenReturn(mockGRNItem);
 
         ScanItemRequest request = new ScanItemRequest();
-        request.setGrnItemId("item-001");
+        request.setGrnId("grn-001");
+        request.setSkuId("sku-001");
         request.setReceivedQuantity(80);
         request.setStatus(GRNItemStatus.ACCEPTED);
 
@@ -156,11 +157,12 @@ public class GRNServiceTest {
     @Test
     void scanItem_ShouldThrowException_WhenGRNAlreadyConfirmed() {
         mockGRN.setStatus(GRNStatus.CONFIRMED);
-        when(grnItemRepository.findById("item-001"))
+        when(grnItemRepository.findByGrnIdAndSkuId("grn-001", "sku-001"))
                 .thenReturn(Optional.of(mockGRNItem));
 
         ScanItemRequest request = new ScanItemRequest();
-        request.setGrnItemId("item-001");
+        request.setGrnId("grn-001");
+        request.setSkuId("sku-001");
         request.setReceivedQuantity(80);
         request.setStatus(GRNItemStatus.ACCEPTED);
 

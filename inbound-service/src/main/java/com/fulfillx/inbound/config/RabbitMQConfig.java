@@ -10,48 +10,57 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-
-    // --------- Exchange Names -------------
+    public static final String STOCK_RECEIVED_QUEUE = "stock.received.queue";
     public static final String INBOUND_EXCHANGE = "inbound.exchange";
-    // mail sorter/post office desk: letters don't directly goes inside a mailbox
-    // you hand it to a exchange ( which is Topic exchange in this case)
-    // Topic Exchange reads routing instructions like a mail sorter reads a zip code
+    public static final String STOCK_RECEIVED_ROUTING_KEY = "stock.received";
+
+    public static final String DLX_EXCHANGE = "inbound.dlx.exchange";
+    public static final String STOCK_DLQ = "stock.received.dlq";
+    public static final String STOCK_DLQ_ROUTING_KEY = "stock.received.dlq.routing.key";
+
+
+    // until a worker service comes and picks it(conusmer) // QUEUE
+    // Quorum Queue tied with a DLX
+    @Bean
+    public Queue stockReceivedQueue() {
+        return QueueBuilder
+                .durable(STOCK_RECEIVED_QUEUE)
+                .quorum() // This sets x-queue-type: quorum
+                .withArgument("x-dead-letter-exchange",DLX_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", STOCK_DLQ_ROUTING_KEY)
+                .build();
+    }
+
+    // Messages are sent to Topic Exchanges
+    // Topic Exchange reads routing instructions like a mail sorter reads a zip code and sends it
     @Bean
     public TopicExchange inboundExchange() {
         return new TopicExchange(INBOUND_EXCHANGE);
     }
 
-
-    // ----------------- Routing Keys ----------------
-    public static final String STOCK_RECEIVED_ROUTING_KEY = "stock.received";
-
-    // rulebook thata connects exchange to the queues
-    /*
-    * if an incoming message arrives at inbound.exchange with a stick note stock.recevied
-    * (the route key), route it straight into the stock.recevied.queue mailbox
-    * */
+    // Rulebook that connects Exchange to the queues
+    // if an incoming message arrives at INBOUND_EXCHANGE with a note stock.recevied
+    // (the route key), route it straight into the stock.recevied.queue mailbox
     public Binding stockReceivedBinding(){
         return BindingBuilder
                 .bind(stockReceivedQueue())
                 .to(inboundExchange())
                 .with(STOCK_RECEIVED_ROUTING_KEY);
     }
-    //"If a message arrives at INBOUND_EXCHANGE
-    // with routing key 'stock.received'
-    // → send it to STOCK_RECEIVED_QUEUE"
 
-
-    // ----------------- Queue Names ---------------------
-    public static final String STOCK_RECEIVED_QUEUE = "stock.received.queue";
-    // mailbox: Stock arrives and stays inside the mailbox
-    // until a worker service comes and picks it(conusmer)
+    // Declare the Dead Letter Queue (also a Quorum!) and Exchange
     @Bean
-    public Queue stockReceivedQueue() {
-        return QueueBuilder
-                .durable(STOCK_RECEIVED_QUEUE)
-                .build();
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(STOCK_DLQ).quorum().build();
     }
-
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DLX_EXCHANGE);
+    }
+    @Bean
+    public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(STOCK_DLQ_ROUTING_KEY);
+    }
 
 
     // Message Converter
