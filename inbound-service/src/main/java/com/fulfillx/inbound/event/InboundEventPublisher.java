@@ -30,24 +30,4 @@ public class InboundEventPublisher {
         );
 //        log.info("STOCK_RECEIVED event published successfully. ");
     }
-
-
-    @PostConstruct
-    public void setupCallbacks(){
-        // ConfirmCallback: Triggers when the broker physically receives/rejects the message
-        rabbitTemplate.setConfirmCallback(((correlationData, ack, cause) ->{
-            if(correlationData == null)return;
-
-            String messageId = correlationData.getId();
-            if(ack){
-                log.info("RabbitMQ confirmed receipt of message ID: {}",messageId);
-            } else {
-                // rejected : queue limit reached, broker shutting down
-                log.error("RabbitMQ Rejected message Id: {}, Reason:{}",messageId,cause);
-
-                // future work: save to outbox table in db for cron job
-            }
-        }));
-
-    }
 }
