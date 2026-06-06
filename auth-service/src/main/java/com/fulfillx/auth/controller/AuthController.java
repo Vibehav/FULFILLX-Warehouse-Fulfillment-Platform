@@ -1,7 +1,9 @@
 package com.fulfillx.auth.controller;
 
+import com.fulfillx.auth.config.RateLimiter;
 import com.fulfillx.auth.dto.*;
 import com.fulfillx.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final RateLimiter rateLimiter;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
@@ -24,8 +27,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
-            @Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        String ip = httpRequest.getRemoteAddr();
+        rateLimiter.checkLoginLimit(ip);
         return ResponseEntity.ok(authService.login(request));
     }
 
