@@ -63,9 +63,7 @@ Delivered → Order Closed
 | 4  | Inventory Service    | Real-time stock, reservations, optimistic locking, Redis cache           |
 | 5  | Order Service        | Bulk order lifecycle management, stock failure handling                  |
 | 6  | Shipment Service     | Courier allocation, mock tracking                                        |
-
 ---
-
 ## Roles
 
 | Role | Responsibility |
@@ -167,6 +165,67 @@ http://localhost:{port}/swagger-ui.html
 | Shipment | 8086 | http://localhost:8086/swagger-ui.html |
 
 ---
+
+## Build Phases
+
+### ✅ Phase 1 – Infrastructure Setup
+
+- Docker Compose: PostgreSQL, Redis, RabbitMQ
+- Parent pom.xml & project folder structure
+- Flyway setup
+
+### ✅ Phase 2 – Authentication Service and Common Module
+
+- Auth service - Registration, login
+- Token refresh & logout via **Redis blacklist**
+- Spring Security filter chain
+- Common module: Role-based access control (7 roles)
+- JWT implementation
+
+### ✅ Phase 3 – Catalogue Service
+
+- SKU master, tenant-level isolation
+- GRN + GRN Items Creation
+- PostgreSQL + Flyway
+
+### ✅ Phase 4 – Inbound Service (Day 7-8)
+
+- GRN Confirmation, Mock Barcode Scanning
+- RabbitMQ publisher → `inbound.exchange` → `stock.received.queue`
+- Quorum queue, DLX/DLQ, ConfirmCallback, ReturnsCallback
+
+### ✅ Phase 5 - Inventory Service
+
+- Stock levels per SKU/warehouse/tenant, optimistic locking (`@Version`)
+- Redis caching, idempotency via processed ledger tables
+- `@Retryable` (4 attempts, exponential backoff) for lock conflicts
+- Consumes `stock.received.queue`, `order.created.queue`
+- Publishes `STOCK_RESERVED` / `STOCK_FAILED` → `inventory.exchange`
+- Quorum queues, DLX/DLQ on all queues
+
+### ✅ Phase 6 – Order Service
+
+- Bulk order creation
+- Order lifecycle: `PENDING → RESERVED → CONFIRMED → SHIPPED → DELIVERED → FAILED`
+- Consumes `stock.reserved.queue`, `stock.failed.queue`
+- Publishes `ORDER_CREATED`, `ORDER_CONFIRMED` → `order.exchange`
+- Quorum queues, DLX/DLQ
+
+### ✅ Phase 7 – Shipment Service
+
+- Consumes `order.confirmed.queue` → mock courier allocation
+- Publishes `ORDER_DELIVERED` → `shipment.exchange`
+- Quorum queues, DLX/DLQ
+---
+## log
+- [X] Phase 1 - Infrastructure Setup
+- [X] Phase 2 - Authentication Microservice and Common Module
+- [X] Phase 3 - Catalogue Microservice
+- [X] Phase 4 - Inbound Microservice
+- [X] Phase 5 - Inventory Microservice
+- [X] Phase 6 - Order Microservice
+- [X] Phase 7 - Shipment Microservice
+---
 ## Future Roadmap
 
 - [ ] Vendor Service — supplier & truck management
@@ -177,5 +236,3 @@ http://localhost:{port}/swagger-ui.html
 - [ ] Analytics Service — seller dashboards & KPIs
 - [ ] API Gateway — centralized routing & rate limiting
 ---
-
-> Built to demonstrate backend engineering depth — inspired by real B2B fulfillment platforms like Easyecom and Unicommerce.
