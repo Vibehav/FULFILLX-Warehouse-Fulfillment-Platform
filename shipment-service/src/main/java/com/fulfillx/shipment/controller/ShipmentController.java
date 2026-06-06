@@ -21,10 +21,9 @@ public class ShipmentController {
     // Get Shipment by ID
     @GetMapping("/{shipmentId}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN', 'WAREHOUSE_MANAGER')")
-    public ResponseEntity<ShipmentResponse> getShipment(
-            @PathVariable String shipmentId,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<ShipmentResponse> getShipment(@PathVariable String shipmentId, HttpServletRequest httpRequest) {
         String tenantId = (String) httpRequest.getAttribute("tenantId");
+
         return ResponseEntity.ok(
                 shipmentService.getShipment(shipmentId, tenantId));
     }
@@ -32,10 +31,10 @@ public class ShipmentController {
     // Get Shipment by Order ID
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN', 'WAREHOUSE_MANAGER')")
-    public ResponseEntity<ShipmentResponse> getShipmentByOrder(
-            @PathVariable String orderId,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<ShipmentResponse> getShipmentByOrder(@PathVariable String orderId,
+                                                               HttpServletRequest httpRequest) {
         String tenantId = (String) httpRequest.getAttribute("tenantId");
+
         return ResponseEntity.ok(
                 shipmentService.getShipmentByOrder(orderId, tenantId));
     }
@@ -43,9 +42,9 @@ public class ShipmentController {
     // Get All Shipments by Tenant
     @GetMapping("/tenant")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN', 'WAREHOUSE_MANAGER')")
-    public ResponseEntity<List<ShipmentResponse>> getShipmentsByTenant(
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<List<ShipmentResponse>> getShipmentsByTenant( HttpServletRequest httpRequest) {
         String tenantId = (String) httpRequest.getAttribute("tenantId");
+
         return ResponseEntity.ok(
                 shipmentService.getShipmentsByTenant(tenantId));
     }
@@ -53,10 +52,10 @@ public class ShipmentController {
     // Get Shipments by Status
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN', 'WAREHOUSE_MANAGER')")
-    public ResponseEntity<List<ShipmentResponse>> getShipmentsByStatus(
-            @PathVariable ShipmentStatus status,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<List<ShipmentResponse>> getShipmentsByStatus(@PathVariable ShipmentStatus status,
+                                                                       HttpServletRequest httpRequest) {
         String tenantId = (String) httpRequest.getAttribute("tenantId");
+
         return ResponseEntity.ok(
                 shipmentService.getShipmentsByStatus(tenantId, status));
     }
@@ -64,10 +63,10 @@ public class ShipmentController {
     // Mark Delivered
     @PutMapping("/{shipmentId}/deliver")
     @PreAuthorize("hasAnyRole('WAREHOUSE_MANAGER', 'ADMIN')")
-    public ResponseEntity<ShipmentResponse> markDelivered(
-            @PathVariable String shipmentId,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<ShipmentResponse> markDelivered( @PathVariable String shipmentId,
+                                                           HttpServletRequest httpRequest) {
         String tenantId = (String) httpRequest.getAttribute("tenantId");
+
         return ResponseEntity.ok(
                 shipmentService.markDelivered(shipmentId, tenantId));
     }

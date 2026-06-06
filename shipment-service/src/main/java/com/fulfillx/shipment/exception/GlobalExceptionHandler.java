@@ -15,48 +15,49 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ShipmentNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleShipmentNotFound(
-            ShipmentNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleShipmentNotFound( ShipmentNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(ShipmentAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleShipmentAlreadyExists(
-            ShipmentAlreadyExistsException ex) {
+    public ResponseEntity<Map<String, Object>> handleShipmentAlreadyExists( ShipmentAlreadyExistsException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidShipmentStateException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidShipmentState(
-            InvalidShipmentStateException ex) {
+    public ResponseEntity<Map<String, Object>> handleInvalidShipmentState( InvalidShipmentStateException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+
         Map<String, String> errors = new HashMap<>();
+
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String field = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
-            errors.put(field, message);
-        });
+            errors.put(field, message);});
+
         Map<String, Object> response = new HashMap<>();
+
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("errors", errors);
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(
-            RuntimeException ex) {
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
-    private ResponseEntity<Map<String, Object>> buildResponse(
-            HttpStatus status, String message) {
+    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
+
         Map<String, Object> response = new HashMap<>();
+
         response.put("timestamp", LocalDateTime.now());
         response.put("status", status.value());
         response.put("message", message);

@@ -34,7 +34,6 @@ public class Consumer {
         log.info(">>> Received ORDER_CONFIRMED for order: {}",
                 event.getOrderId());
         try {
-
             processedOrderConfirmedRepository.save(new ProcessedOrderConfirmed(event.getOrderId()));
 
             shipmentService.createShipment(event);
