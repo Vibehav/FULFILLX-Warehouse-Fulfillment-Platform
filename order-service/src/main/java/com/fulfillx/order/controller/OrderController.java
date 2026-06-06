@@ -1,5 +1,6 @@
 package com.fulfillx.order.controller;
 
+import com.fulfillx.order.config.OrderRateLimit;
 import com.fulfillx.order.dto.*;
 import com.fulfillx.order.enums.OrderStatus;
 import com.fulfillx.order.service.OrderService;
@@ -19,6 +20,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderRateLimit orderRateLimit;
 
     // Create Order
     @PostMapping("/create")
@@ -28,6 +30,7 @@ public class OrderController {
         String sellerId = (String) httpRequest.getAttribute("userId");
         String tenantId = (String) httpRequest.getAttribute("tenantId");
 
+        orderRateLimit.checkCreateOrderLimit(sellerId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.createOrder(request, sellerId, tenantId));
