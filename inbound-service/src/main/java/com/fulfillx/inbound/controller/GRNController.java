@@ -1,5 +1,6 @@
 package com.fulfillx.inbound.controller;
 
+import com.fulfillx.inbound.config.ScanRateLimit;
 import com.fulfillx.inbound.dto.*;
 import com.fulfillx.inbound.service.GRNService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 public class GRNController {
 
     private final GRNService grnService;
+    private final ScanRateLimit scanRateLimit;
 
     // Create GRN
     @PostMapping("/create")
@@ -35,7 +37,11 @@ public class GRNController {
     @PutMapping("/scan")
     @PreAuthorize("hasAnyRole('INBOUND_OPERATOR', 'WAREHOUSE_MANAGER')")
     public ResponseEntity<GRNItemResponse> scanItem(
-            @Valid @RequestBody ScanItemRequest request) {
+            @Valid @RequestBody ScanItemRequest request,HttpServletRequest httpRequest) {
+
+        String userId = (String) httpRequest.getAttribute("userId");
+        scanRateLimit.checkScanLimit(userId);
+
         return ResponseEntity.ok(grnService.scanItem(request));
     }
 

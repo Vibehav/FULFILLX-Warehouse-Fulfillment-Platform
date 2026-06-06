@@ -3,6 +3,7 @@ package com.fulfillx.inbound.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,21 +16,23 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(GRNNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleGRNNotFound(
-            GRNNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleGRNNotFound(GRNNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(GRNItemNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleGRNItemNotFound(
-            GRNItemNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleGRNItemNotFound(GRNItemNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidGRNStateException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidGRNState(
-            InvalidGRNStateException ex) {
+    public ResponseEntity<Map<String, Object>> handleInvalidGRNState(InvalidGRNStateException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Map<String,Object>> handleRateLimitExceeded(RateLimitExceededException ex){
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS,ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
