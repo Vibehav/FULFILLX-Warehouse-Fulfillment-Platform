@@ -1,0 +1,1 @@
+CREATE TABLE processed_order_deliver_ledger (order_id VARCHAR(255) PRIMARY KEY);
