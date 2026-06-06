@@ -4,28 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StockReceivedEvent { // Inbound the accepted Items inside the inventory
+public class OrderCreatedEvent {
 
-    private String grnId;
-    private String warehouseId;
+    private String orderId;
     private String tenantId;
-    private List<StockItem> items;
-    private LocalDateTime receivedAt;
+    private String warehouseId;
+    private List<OrderItem> items;
 
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class StockItem {
+    public static class OrderItem {
         private String skuId;
-        private Integer receivedQuantity;
+        private Integer quantity;
+        private String warehouseId;
     }
 }
