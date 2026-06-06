@@ -4,23 +4,6 @@ FulfillX is a B2B warehouse fulfillment platform where vendors supply stock, war
 ---
 ## Physical Flow
 
-```
-Vendor sends Truck → Inbound Operator Scans & Receives Stock (GRN Created)
-        ↓
-Catalogue SKU referenced → Inventory Updated via RabbitMQ
-
-
-Seller places Bulk Order
-        ↓
-Inventory Reserves Quantity  / If Quantity Exceeds
-        ↓                               ↓
-        ↓                     Insufficient Stock Order failed
-        ↓
-        ↓
-Order Confirmed → Courier Allocated → Shipped
-        ↓
-Delivered → Order Closed
-```
 ### Tech Stack
 ##### Backend
 * Java 21
@@ -50,6 +33,23 @@ Delivered → Order Closed
 - Lombok
 ---
 
+```
+Vendor sends Truck → Inbound Operator Scans & Receives Stock (GRN Created)
+        ↓
+Catalogue SKU referenced → Inventory Updated via RabbitMQ
+
+
+Seller places Bulk Order
+        ↓
+Inventory Reserves Quantity  / If Quantity Exceeds
+        ↓                               ↓
+        ↓                     Insufficient Stock Order failed
+        ↓
+        ↓
+Order Confirmed → Courier Allocated → Shipped
+        ↓
+Delivered → Order Closed
+```
 ## Microservices
 
 ### ✅ Core Services (Current Scope)
