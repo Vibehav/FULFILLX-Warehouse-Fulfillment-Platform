@@ -88,7 +88,8 @@ Delivered → Order Closed
 | `ORDER_DELIVERED` | Shipment | Order | Close order                     |
 
 ---
-![RabbitMQ] (https://drive.google.com/file/d/1D1JbvBRjs7Rid9Rz0XwMbv-t2JFyVUzf/view?usp=sharing)
+
+<img width="1768" height="852" alt="RabbitMQ" src="https://github.com/user-attachments/assets/5d24b798-59b9-47b1-9cd8-562754215d23" />
 
 ### Dead Letter Queue (DLQ) Architecture
 Every critical queue is backed by a DLX + DLQ to prevent message loss on processing failures.
