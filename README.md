@@ -4,23 +4,6 @@ FulfillX is a B2B warehouse fulfillment platform where vendors supply stock, war
 ---
 ## Physical Flow
 
-```
-Vendor sends Truck → Inbound Operator Scans & Receives Stock (GRN Created)
-        ↓
-Catalogue SKU referenced → Inventory Updated via RabbitMQ
-
-
-Seller places Bulk Order
-        ↓
-Inventory Reserves Quantity  / If Quantity Exceeds
-        ↓                               ↓
-        ↓                     Insufficient Stock Order failed
-        ↓
-        ↓
-Order Confirmed → Courier Allocated → Shipped
-        ↓
-Delivered → Order Closed
-```
 ### Tech Stack
 ##### Backend
 * Java 21
@@ -50,6 +33,23 @@ Delivered → Order Closed
 - Lombok
 ---
 
+```
+Vendor sends Truck → Inbound Operator Scans & Receives Stock (GRN Created)
+        ↓
+Catalogue SKU referenced → Inventory Updated via RabbitMQ
+
+
+Seller places Bulk Order
+        ↓
+Inventory Reserves Quantity  / If Quantity Exceeds
+        ↓                               ↓
+        ↓                     Insufficient Stock Order failed
+        ↓
+        ↓
+Order Confirmed → Courier Allocated → Shipped
+        ↓
+Delivered → Order Closed
+```
 ## Microservices
 
 ### ✅ Core Services (Current Scope)
@@ -88,7 +88,8 @@ Delivered → Order Closed
 | `ORDER_DELIVERED` | Shipment | Order | Close order                     |
 
 ---
-![RabbitMQ](/RabbitMQ.png)
+
+<img width="1768" height="852" alt="RabbitMQ" src="https://github.com/user-attachments/assets/5d24b798-59b9-47b1-9cd8-562754215d23" />
 
 ### Dead Letter Queue (DLQ) Architecture
 Every critical queue is backed by a DLX + DLQ to prevent message loss on processing failures.
